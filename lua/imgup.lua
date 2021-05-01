@@ -3,44 +3,19 @@ local M = {}
 local Job = require 'plenary.job'
 local Matic = require 'imgup.puremagic.puremagic'
 
-M.get_image_url = function()
-  return vim.fn['imgup#get_image_url']()
-end
-
-local function switch_gcloud_conf(name)
-  if name == nil then
+local function get_image_url()
+  local res = vim.fn['imgup#get_image_url']()
+  if #res == 0 then
     return nil
   end
-
-  local result, code = Job:new({
-    command = 'gcloud',
-    args = {'config', 'configurations', 'list', '--filter', 'IS_ACTIVE:true', '--format', 'json'},
-    env = vim.env,
-    enable_recording = true,
-  }):sync()
-  if code ~= 0 then
-    error('failed to list gcloud configurations: ' .. code)
-  end
-
-  local conf_active = vim.fn.json_decode(vim.fn.join(result, ''))[1]['name']
-  if conf_active == name or conf_active == nil then
-    return nil
-  end
-
-  _, code = Job:new({
-    command = 'gcloud',
-    args = {'config', 'configurations', 'activate', name}
-  }):sync()
-  if code ~= 0 then
-    error('failed to acitvate gcloud configuration ' .. name .. ': ' .. code)
-  end
-
-  return conf_active
+  return res[1], res[2], res[3], res[4]
 end
+M.get_image_url = get_image_url
 
-M.is_local = function(path)
+local function is_local(path)
   return string.find(path, '^https?://') == nil
 end
+M.is_local = is_local
 
 local function download(path)
   local temp = vim.fn.tempname()
@@ -48,39 +23,51 @@ local function download(path)
   return temp
 end
 
-local function guess_name(path, ext)
+local function guess_ext(path)
+  local mime = Matic.via_path(path)
+  if mime == nil then
+    return nil
+  end
+  if vim.tbl_contains({'image/png', 'image/jpeg', 'image/gif', 'image/tiff', 'image/webp'}, mime) then
+    return string.sub(mime, 7)
+  end
+  return nil
+end
+
+local function guess_name(path)
+  local ext = guess_ext(path)
+  if ext == nil then
+    error(string.format('failed to guesss ext for ', path))
+  end
   return string.gsub(vim.fn.fnamemodify(path, ':t'), '%.[^%.]+$', '', 1) .. ext
 end
 
-local function upload(path)
-  local mime = Matic.via_path(path)
-  if mime == nil then
-    error('failed to upload a file ' .. path .. ': failed to guess mime type')
+local function store(path)
+  if not is_local(path) then
+    path = download(path)
   end
-
-  -- UNDONE: bind base url
-  -- UNDONE: rondomize name or the trim extension
-  if mime == 'image/png' then
-    return 'https://post.kyoh86.dev/image/' .. guess_name(path, '.png')
-  elseif mime == 'image/jpeg' then
-    return 'https://post.kyoh86.dev/image/' .. guess_name(path, '.jpeg')
-  elseif mime == 'image/gif' then
-    return 'https://post.kyoh86.dev/image/' .. guess_name(path, '.gif')
-  elseif mime == 'image/svg+xml' then
-    return 'https://post.kyoh86.dev/image/' .. guess_name(path, '.svg')
-  elseif mime == 'image/tiff' then
-    return 'https://post.kyoh86.dev/image/' .. guess_name(path, '.tiff')
-  elseif mime == 'image/webp' then
-    return 'https://post.kyoh86.dev/image/' .. guess_name(path, '.webp')
-  end
-  error('failed to upload a file ' .. path .. ': not supported mime type (' .. mime .. ')')
+  local name = guess_name(path)
+  return require('imgup.gcloud').upload(path, name)
 end
+M.store = store
 
-M.store = function(path)
-  if not M.is_local(path) then
-    path = download(Path)
+local function replace()
+  -- replace url in the Markdown Image (i.e. "![alternative text](image url)")
+  local source, scol, ecol, line = get_image_url()
+  if url == nil then
+    return
   end
-  return upload(path)
+
+  -- TODO: upload
+  -- TODO: replace ![...](source =wxh) and [](source)
+end
+M.replace = replace
+
+local function paste()
+  -- upload a path in the register and put Markdown Image (i.e. "![alternative text](image url)")
+  -- TODO: upload
+  -- TODO: paste img link
+  -- seealso: https://stackoverflow.com/questions/65429368/paste-path-in-clipboard-modified-to-be-relative-to-current-buffer-in-vim
 end
 
 return M
