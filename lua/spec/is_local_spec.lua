@@ -1,0 +1,13 @@
+local imgup = require('imgup')
+
+describe("is_local", function()
+  it("local", function()
+    assert.is_true(imgup.is_local('foobar'))
+  end)
+  it("http", function()
+    assert.is_false(imgup.is_local('http://example.com'))
+  end)
+  it("https", function()
+    assert.is_false(imgup.is_local('https://example.com'))
+  end)
+end)
