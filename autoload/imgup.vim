@@ -10,6 +10,10 @@ function! imgup#get_image_url() abort
   endif
 endfunction
 
-function! imgup#set_image_url(old, new) abort
-  call execute('%substitute/\C\(!\=\[[^\]]*\](\)\@<=\V' .. a:old .. '\m\(\( \+=\d\+x\d*\)\=)\)\@=/' .. escape(a:new, '/\') .. '/g')
+function! imgup#update_image_url(old, new) abort
+  let [l:old, l:new] = [escape(a:old, '/\'), escape(a:new, '/\')]
+  " update image source
+  call execute('%substitute/\C\(!\[[^\]]*\](\)\@<=\V' .. l:old .. '\m\(\( \+=\d\+x\d*\)\=)\)\@=/' .. l:new .. '/g')
+  " update link ref
+  call execute('%substitute/\C\(\(!\)\@<!\[\%([^\]]*\|!\[[^\]]*\]([^)]*)\)\](\)\@<=\V' .. l:old .. '\m\()\)\@=/' .. l:new .. '/g')
 endfunction

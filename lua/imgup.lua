@@ -12,6 +12,11 @@ local function get_image_url()
 end
 M.get_image_url = get_image_url
 
+local function update_image_url(old, new)
+  vim.fn['imgup#update_image_url'](old, new)
+end
+M.update_image_url = update_image_url
+
 local function is_local(path)
   return string.find(path, '^https?://') == nil
 end
@@ -54,22 +59,18 @@ M.store = store
 local function replace()
   -- replace url in the Markdown Image (i.e. "![alternative text](image url)")
   local source, scol, ecol, line = get_image_url()
-  if url == nil then
+  if source == nil then
     return
   end
 
-  vim.api.nvim_buf_get_lines(0, line, line, true)
-  local before = vim.fn.getline(line)
-  -- TODO: upload
-  -- TODO: replace ![...](source =wxh) and [](source)
+  local url = store(source)
+  update_image_url(source, url)
 end
 M.replace = replace
 
-local function paste()
-  -- upload a path in the register and put Markdown Image (i.e. "![alternative text](image url)")
-  -- TODO: upload
-  -- TODO: paste img link
-  -- seealso: https://stackoverflow.com/questions/65429368/paste-path-in-clipboard-modified-to-be-relative-to-current-buffer-in-vim
+local function paste(source)
+  local url = store(source)
+  vim.cmd('put "![](' .. source .. ')')
 end
 
 return M
