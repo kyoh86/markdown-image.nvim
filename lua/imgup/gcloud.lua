@@ -1,3 +1,16 @@
+local M = {}
+
+local function is_valid()
+  if vim.g["imgup#gcloud#bucket_name"] == nil then
+    return false, "set g:imgup#gcloud#bucket_name"
+  end
+  if vim.g["imgup#gcloud#host_name"] == nil then
+    return false, "set imgup#gcloud#host_name"
+  end
+  return true
+end
+M.is_valid = is_valid
+
 local function switch_conf(name)
   if name == nil then
     return nil
@@ -31,13 +44,13 @@ local function switch_conf(name)
 end
 
 local function upload_core(source, name)
-  local bucket_name = vim.g['imgup#gcloud#bucket_name']
-  local prefix = string.gsub(vim.g['imgup#gcloud#prefix'], '^/+|/+$', '')
-  local gspath = 'gs://' .. bucket_name
+  local prefix = vim.g['imgup#gcloud#prefix']
   if prefix ~= nil then
-    gspath = gspath .. '/' .. prefix .. '/'
+    name = string.gsub(prefix, '^/+|/+$', '') .. '/' .. name
   end
-  gspath = gspath .. name
+
+  local bucket_name = vim.g['imgup#gcloud#bucket_name']
+  local gspath = 'gs://' .. bucket_name .. '/' .. name
 
   local ls = Job:new({
     command = 'gsutil',
@@ -62,11 +75,9 @@ local function upload_core(source, name)
     error(string.format('failed to upload %s to %s (%d)', source, gspath, code))
   end
 
-  local host_name = vim.g['imgup#gcloud#host_name']
-  return string.format('https://%s/%s/%s', host_name, prefix, name)
+  return string.format('https://%s/%s', vim.g['imgup#gcloud#host_name'], name)
 end
 
-local M = {}
 M.upload = function(path, name)
   local prev_conf = switch_conf(vim.g['imgup#gcloud#config_name'])
   local success, ret = pcall(upload_core, path, name)
