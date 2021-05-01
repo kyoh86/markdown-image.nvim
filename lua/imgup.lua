@@ -58,6 +58,8 @@ local function replace()
     return
   end
 
+  vim.api.nvim_buf_get_lines(0, line, line, true)
+  local before = vim.fn.getline(line)
   -- TODO: upload
   -- TODO: replace ![...](source =wxh) and [](source)
 end
