@@ -39,7 +39,7 @@ local function guess_name(path)
   if ext == nil then
     error(string.format('failed to guesss ext for ', path))
   end
-  return string.gsub(vim.fn.fnamemodify(path, ':t'), '%.[^%.]+$', '', 1) .. ext
+  return string.gsub(vim.fn.fnamemodify(path, ':t'), '%.[^%.]+$', '', 1) .. '.' .. ext
 end
 
 local function is_local(path)

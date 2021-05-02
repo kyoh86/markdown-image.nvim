@@ -13,7 +13,7 @@ endfunction
 function! imgup#update_image_url(old, new) abort
   let [l:old, l:new] = [escape(a:old, '/\'), escape(a:new, '/\')]
   " update image source
-  call execute('%substitute/\C\(!\[[^\]]*\](\)\@<=\V' .. l:old .. '\m\(\( \+=\d\+x\d*\)\=)\)\@=/' .. l:new .. '/g')
+  call execute('%substitute/\C\(!\[[^\]]*\](\)\@<=\V' .. l:old .. '\m\(\( \+=\d\+x\d*\)\=)\)\@=/' .. l:new .. '/g', "silent!")
   " update link ref
-  call execute('%substitute/\C\(\(!\)\@<!\[\%([^\]]*\|!\[[^\]]*\]([^)]*)\)\](\)\@<=\V' .. l:old .. '\m\()\)\@=/' .. l:new .. '/g')
+  call execute('%substitute/\C\(\(!\)\@<!\[\%([^\]]*\|!\[[^\]]*\]([^)]*)\)\](\)\@<=\V' .. l:old .. '\m\()\)\@=/' .. l:new .. '/g', "silent!")
 endfunction

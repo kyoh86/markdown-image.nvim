@@ -1,3 +1,5 @@
+local Job = require 'plenary.job'
+
 local M = {}
 
 local function is_valid()
@@ -40,6 +42,7 @@ local function switch_conf(name)
     error(string.format('failed to acitvate gcloud configuration %s (%d)', name, code))
   end
 
+  print(string.format("activated gcloud configuration %s", name))
   return conf_active
 end
 
@@ -55,24 +58,26 @@ local function upload_core(source, name)
   local ls = Job:new({
     command = 'gsutil',
     args = {'ls', gspath},
-    env = vim.env,
     enable_recording = true,
   })
   local result, code = ls:sync()
   if code == 0 and result == gspath then
     error(string.format('%s is already exist', gspath))
   end
-  if not (code == 1 and ls:stderr_result() == "CommandException: One or more URLs matched no objects.") then
-    error(string.format('failed to check existance of %s (%d)', gspath, code))
+  local errors = ls:stderr_result()
+  if not (code == 1 and #errors > 0 and errors[1] == "CommandException: One or more URLs matched no objects.") then
+    error(string.format('failed to check existance of %s: %s (%d)', gspath, table.concat(errors, '\n'), code))
   end
 
-  _, code = Job:new({
+  local cp = Job:new({
     command = 'gsutil',
     args = {'cp', source, gspath},
-    env = vim.env,
-  }):sync()
+    enable_recording = true,
+  })
+  _, code = cp:sync()
   if code ~= 0 then
-    error(string.format('failed to upload %s to %s (%d)', source, gspath, code))
+    local errors = cp:stderr_result()
+    error(string.format('failed to upload %s to %s: %s (%d)', source, gspath, table.concat(errors, '\n'), code))
   end
 
   return string.format('https://%s/%s', vim.g['imgup#gcloud#host_name'], name)
