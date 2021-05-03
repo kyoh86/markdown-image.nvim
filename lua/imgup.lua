@@ -35,13 +35,14 @@ local function store(path)
     error("it's already deployed file")
   end
 
-  local origin = nil
-  if not is_local(path) then
-    origin = path
-    path = download(path)
+  if is_local(path) then
+    return deploy_module.deploy(path, nil)
+  else
+    temp = download(path)
+    repl = deploy_module.deploy(temp, path)
+    os.remove(temp)
+    return repl
   end
-
-  return deploy_module.deploy(path, origin)
 end
 
 local function replace()
