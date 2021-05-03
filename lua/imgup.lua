@@ -26,13 +26,13 @@ local function is_local(path)
 end
 M.is_local = is_local -- for test
 
-local upload_module = require('imgup.gcloud') -- UNDONE: make it configureable
+local deploy_module = require('imgup.gcloud') -- UNDONE: make it configureable
 
 local function store(path)
-  upload_module.ready()
+  deploy_module.ready()
 
-  if upload_module.has(path) then
-    error("it's already uploaded file")
+  if deploy_module.has(path) then
+    error("it's already deployed file")
   end
 
   local origin = nil
@@ -41,7 +41,7 @@ local function store(path)
     path = download(path)
   end
 
-  return upload_module.upload(path, origin)
+  return deploy_module.deploy(path, origin)
 end
 
 local function replace()

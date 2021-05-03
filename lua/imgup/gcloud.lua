@@ -87,7 +87,7 @@ local function guess_ext(self)
   return nil
 end
 
-local function upload_core(path)
+local function upload(path)
   local name = nanoid() .. guess_ext(path)
 
   local prefix = vim.g['imgup#gcloud#prefix']
@@ -116,9 +116,9 @@ local function upload_core(path)
   return string.format('https://%s/%s', vim.g['imgup#gcloud#host_name'], name)
 end
 
-M.upload = function(path, origin)
+M.deploy = function(path, origin)
   local prev_conf = switch_conf(vim.g['imgup#gcloud#config_name'])
-  local success, ret = pcall(upload_core, path)
+  local success, ret = pcall(upload, path)
   if prev_conf then
     switch_conf(prev_conf)
   end
