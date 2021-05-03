@@ -1,6 +1,7 @@
+local Job = require 'plenary.job'
+
 local M = {}
 
-local Job = require 'plenary.job'
 local function get_image_url()
   local res = vim.fn['imgup#get_image_url']()
   if #res == 0 then
@@ -16,8 +17,14 @@ end
 
 local function download(path)
   local temp = vim.fn.tempname()
-  -- TODO: use plenary.Job
-  os.execute('curl --output ' .. temp ' ' .. vim.fn.shellescape(path))
+  local _, code = Job:new({
+    command = 'curl',
+    args = {'--output', temp, path},
+    env = vim.env,
+  }):sync()
+  if code ~= 0 then
+    error(string.format('failed to download %s (%d)', path, code))
+  end
   return temp
 end
 
