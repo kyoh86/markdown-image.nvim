@@ -3,11 +3,7 @@ local Job = require 'plenary.job'
 local M = {}
 
 local function get_image_url()
-  local res = vim.fn['imgup#get_image_url']()
-  if #res == 0 then
-    return nil
-  end
-  return res[1], res[2], res[3], res[4]
+  return vim.fn['imgup#get_image_url']()
 end
 M.get_image_url = get_image_url
 
@@ -15,61 +11,56 @@ local function update_image_url(old, new)
   vim.fn['imgup#update_image_url'](old, new)
 end
 
-local function download(path)
+local function download(source)
   local temp = vim.fn.tempname()
   local _, code = Job:new({
     command = 'curl',
-    args = {'--output', temp, path},
+    args = {'--output', temp, source},
     env = vim.env,
   }):sync()
   if code ~= 0 then
-    error(string.format('failed to download %s (%d)', path, code))
+    error(string.format('failed to download %s (%d)', source, code))
   end
   return temp
 end
 
-local function is_local(path)
-  return string.find(path, '^https?://') == nil
+local function _is_local(source)
+  return string.find(source, '^https?://') == nil
 end
-M.is_local = is_local -- for test
+M._is_local = _is_local -- publish for test
 
-local deploy_module = require('imgup.gcloud') -- UNDONE: make it configureable
-
-local function store(path)
-  deploy_module.ready()
-
-  if deploy_module.has(path) then
-    error("it's already deployed file")
+local function deploy(deployer, source)
+  local err = deployer.check(source)
+  if err ~= nil then
+    error(nil)
   end
 
-  if is_local(path) then
-    return deploy_module.deploy(path, nil)
+  if _is_local(source) then
+    return deployer.deploy(source, nil)
   else
-    temp = download(path)
-    repl = deploy_module.deploy(temp, path)
+    temp = download(source)
+    repl = deployer.deploy(temp, source)
     os.remove(temp)
     return repl
   end
 end
 
-local function replace()
+local function replace(deployer)
   -- replace url in the Markdown Image (i.e. "![alternative text](image url)")
-  local source, scol, ecol, line = get_image_url()
-  if source == nil then
+  local source = get_image_url()
+  if source == '' then
     error("NOT A IMAGE")
   end
-
-  local url = store(source)
-  update_image_url(source, url)
+  update_image_url(source, deploy(source))
 end
 M.replace = replace
 
-local function put(source)
-  if not vim.fn.filereadable(source) then
-    error(string.format("NOT A FILE: %s", source))
+local function put(deployer)
+  local source = vim.fn.getreg(vim.v.register)
+  if source == '' then
+    return
   end
-  local url = store(source)
-  vim.cmd('put "![](' .. source .. ')')
+  vim.cmd('put "![](' .. deploy(deployer, source) .. ')')
 end
 M.put = put
 

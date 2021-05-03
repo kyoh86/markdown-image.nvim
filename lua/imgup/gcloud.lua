@@ -1,26 +1,7 @@
 local Job = require 'plenary.job'
 local nanoid = require('nanoid')
 
-local M = {}
-
-local function ready()
-  if vim.g["imgup#gcloud#bucket_name"] == nil then
-    error("set g:imgup#gcloud#bucket_name")
-  end
-  if vim.g["imgup#gcloud#host_name"] == nil then
-    error("set imgup#gcloud#host_name")
-  end
-end
-M.ready = ready
-
-local function has(origin)
-  local url = require('resty.url').parse(origin)
-  if url == vim.g["imgup#gcloud#host_name"] then
-    return true
-  end
-  return false
-end
-M.has = has
+local Deployer = {}
 
 local function switch_conf(name)
   if name == nil then
@@ -72,15 +53,14 @@ local function exist(path)
   return false
 end
 
-local function upload(path)
+local function upload(host, bucket, prefix, path)
   local name = nanoid()
 
-  local prefix = vim.g['imgup#gcloud#prefix']
-  if prefix ~= nil then
+  if prefix ~= nil and prefix ~= '' then
     name = string.gsub(prefix, '^/+|/+$', '') .. '/' .. name
   end
 
-  local bucket_name = vim.g['imgup#gcloud#bucket_name']
+  local bucket_name = bucket
   local gspath = 'gs://' .. bucket_name .. '/' .. name
 
   if exist(gspath) then
@@ -98,12 +78,21 @@ local function upload(path)
     error(string.format('failed to upload %s to %s: %s (%d)', source.path, gspath, table.concat(errors, '\n'), code))
   end
 
-  return string.format('https://%s/%s', vim.g['imgup#gcloud#host_name'], name)
+  return string.format('https://%s/%s', host, name)
 end
 
-M.deploy = function(path, origin)
-  local prev_conf = switch_conf(vim.g['imgup#gcloud#config_name'])
-  local success, ret = pcall(upload, path)
+function Deployer.check(self, origin)
+  -- check whether the origin is supported or not
+  local url = require('resty.url').parse(origin)
+  if url.host == self.host then
+    error("it's already deployed file")
+  end
+end
+
+function Deployer.deploy(self, path, original)
+  -- deploy path and get URL for deployed resource
+  local prev_conf = switch_conf(self.config)
+  local success, ret = pcall(upload, self.host, self.bucket, self.prefix, path)
   if prev_conf then
     switch_conf(prev_conf)
   end
@@ -113,4 +102,24 @@ M.deploy = function(path, origin)
     error(ret)
   end
 end
-return M
+
+function Deployer.new(host, config, bucket, prefix)
+  local obj = {
+    host = host,
+    config = config,
+    bucket = bucket,
+    prefix = prefix,
+  }
+  if host == nil or host == '' then
+    error("empty host name")
+  end
+  if config == nil or config == '' then
+    error("empty config name")
+  end
+  if bucket == nil or bucket == '' then
+    error("empty bucket name")
+  end
+  return setmetatable(obj, {__index = Deployer})
+end
+
+return Deployer
