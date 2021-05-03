@@ -11,8 +11,12 @@ local function update_image_url(old, new)
   vim.fn['imgup#update_image_url'](old, new)
 end
 
+local function echo(msg)
+  vim.cmd('echo "' .. vim.fn.escape(msg, '"') .. '" | redraw')
+end
+
 local function download(source)
-  print(string.format("imgup: Downloading %s...", source))
+  echo(string.format("imgup: Downloading %s...", source))
 
   local temp = vim.fn.tempname()
   local _, code = Job:new({
@@ -38,11 +42,11 @@ local function deploy(deployer, source)
   end
 
   if _is_local(source) then
-    print(string.format("imgup: Deploying %s...", source))
+    echo(string.format("imgup: Deploying %s...", source))
     return deployer:deploy(source, nil)
   else
     temp = download(source)
-    print(string.format("imgup: Deploying %s...", temp))
+    echo(string.format("imgup: Deploying %s...", temp))
     repl = deployer:deploy(temp, source)
     os.remove(temp)
     return repl
@@ -55,7 +59,8 @@ local function replace(deployer)
   if source == nil or source == '' then
     error("NOT A IMAGE")
   end
-  update_image_url(source, deploy(source))
+  update_image_url(source, deploy(deployer, source))
+  echo("imgup: Replaced.")
 end
 M.replace = replace
 
@@ -66,6 +71,7 @@ local function put(deployer)
   end
   local repl = deploy(deployer, source)
   vim.cmd("put ='![](" .. repl .. ")'")
+  echo("imgup: Put.")
 end
 M.put = put
 
