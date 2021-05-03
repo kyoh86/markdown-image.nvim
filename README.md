@@ -18,11 +18,14 @@ Markdownの画像（すなわち、 `![alt-text](image-url)` ）の上で呼び�
 指定のレジスタから画像のURLまたはファイルパスを取得して、
 これを適切な場所に配置してMarkdownの画像（すなわち、 `![](image-url)` ）として挿入する。
 
+nmapしたキーの前に `"a` のようにレジスタの指定を挟むことで、
+デフォルトじゃないレジスタが使える。
+
 ## 設定
 
 ```lua
-vim.api.nvim_set_keymap('n', '<leader>mir', [[<cmd>lua require('imgup').replace(deployer)<cr>]], {noremap = true})
-vim.api.nvim_set_keymap('n', '<leader>mip', [[<cmd>lua require('imgup').put(deployer)<cr>]], {noremap = true})
+vim.api.nvim_set_keymap('n', '<leader>r', [[<cmd>lua require('imgup').replace(deployer)<cr>]], {noremap = true})
+vim.api.nvim_set_keymap('n', '<leader>p', [[<cmd>lua require('imgup').put(deployer)<cr>]], {noremap = true})
 ```
 
 deployerには、以下のインターフェイスを満たすDeployerオブジェクトを指定してください。
