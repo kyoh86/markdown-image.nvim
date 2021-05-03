@@ -73,14 +73,14 @@ Google Cloud SDK、gsutilsのインストールが必要です。
 
 また、以下2つのLuaRocksに依存します。
 
-- `lua-resty-url`
+- `net-url`
 - `nanoid`
 
 Packer.nvimの`rocks`に指定したりしてください。
 
 ```lua
 rocks = {
-  'lua-resty-url',
+  'net-url',
   'nanoid',
 },
 ```
@@ -93,7 +93,7 @@ packer.nvimでの設定例は以下のとおりです
 use {
   'kyoh86/imgup.nvim',
   rocks = {
-    'lua-resty-url',
+    'net-url',
     'nanoid',
   },
   config = function()

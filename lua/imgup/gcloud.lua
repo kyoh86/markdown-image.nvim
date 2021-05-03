@@ -69,13 +69,13 @@ local function upload(host, bucket, prefix, path)
 
   local cp = Job:new({
     command = 'gsutil',
-    args = {'cp', source.path, gspath},
+    args = {'cp', path, gspath},
     enable_recording = true,
   })
   _, code = cp:sync()
   if code ~= 0 then
     local errors = cp:stderr_result()
-    error(string.format('failed to upload %s to %s: %s (%d)', source.path, gspath, table.concat(errors, '\n'), code))
+    error(string.format('failed to upload %s to %s: %s (%d)', path, gspath, table.concat(errors, '\n'), code))
   end
 
   return string.format('https://%s/%s', host, name)
@@ -83,9 +83,9 @@ end
 
 function Deployer.check(self, origin)
   -- check whether the origin is supported or not
-  local url = require('resty.url').parse(origin)
-  if url.host == self.host then
-    error("it's already deployed file")
+  local success, url = pcall(require('net.url').parse, origin)
+  if success and url.host == self.host then
+    error(string.format("%s is already deployed on %s", self.host, origin))
   end
 end
 

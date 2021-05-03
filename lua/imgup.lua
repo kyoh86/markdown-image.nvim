@@ -12,6 +12,8 @@ local function update_image_url(old, new)
 end
 
 local function download(source)
+  print(string.format("imgup: Downloading %s...", source))
+
   local temp = vim.fn.tempname()
   local _, code = Job:new({
     command = 'curl',
@@ -30,16 +32,18 @@ end
 M._is_local = _is_local -- publish for test
 
 local function deploy(deployer, source)
-  local err = deployer.check(source)
+  local err = deployer:check(source)
   if err ~= nil then
     error(nil)
   end
 
   if _is_local(source) then
-    return deployer.deploy(source, nil)
+    print(string.format("imgup: Deploying %s...", source))
+    return deployer:deploy(source, nil)
   else
     temp = download(source)
-    repl = deployer.deploy(temp, source)
+    print(string.format("imgup: Deploying %s...", temp))
+    repl = deployer:deploy(temp, source)
     os.remove(temp)
     return repl
   end
@@ -48,7 +52,7 @@ end
 local function replace(deployer)
   -- replace url in the Markdown Image (i.e. "![alternative text](image url)")
   local source = get_image_url()
-  if source == '' then
+  if source == nil or source == '' then
     error("NOT A IMAGE")
   end
   update_image_url(source, deploy(source))
@@ -57,10 +61,11 @@ M.replace = replace
 
 local function put(deployer)
   local source = vim.fn.getreg(vim.v.register)
-  if source == '' then
-    return
+  if source == nil or source == '' then
+    error("EMPTY REGISTER")
   end
-  vim.cmd('put "![](' .. deploy(deployer, source) .. ')')
+  local repl = deploy(deployer, source)
+  vim.cmd("put ='![](" .. repl .. ")'")
 end
 M.put = put
 
