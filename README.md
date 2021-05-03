@@ -15,11 +15,14 @@ Markdownの画像（すなわち、 `![alt-text](image-url)` ）の上で呼び�
 
 指定のレジスタから画像のURLまたはファイルパスを取得して、
 これを適切な場所に配置してMarkdownの画像（すなわち、 `![](image-url)` ）として挿入する。
+配置先はdeployerによって変わる。
 
 nmapしたキーの前に `"a` のようにレジスタの指定を挟むことで、
 デフォルトじゃないレジスタが使える。
 
 ## 設定
+
+mapして使用することをおすすめします。
 
 ```lua
 vim.api.nvim_set_keymap('n', '<leader>r', [[<cmd>lua require('imgup').replace(deployer)<cr>]], {noremap = true})
@@ -37,6 +40,10 @@ function Deployer.deploy(self, path, original)
   -- deploy path and get URL for deployed resource
 end
 ```
+
+## 依存
+
+このプラグインは [nvim-lua/plenary.nvim](https://github.com/nvim-lua/plenary.nvim) に依存しています。
 
 ## 内蔵Deployer
 
