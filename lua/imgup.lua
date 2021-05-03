@@ -1,8 +1,6 @@
 local M = {}
 
 local Job = require 'plenary.job'
-local Matic = require 'imgup.puremagic.puremagic'
-
 local function get_image_url()
   local res = vim.fn['imgup#get_image_url']()
   if #res == 0 then
@@ -23,47 +21,27 @@ local function download(path)
   return temp
 end
 
-local function guess_ext(path)
-  local mime = Matic.via_path(path)
-  if mime == nil then
-    return nil
-  end
-  if vim.tbl_contains({'image/png', 'image/jpeg', 'image/gif', 'image/tiff', 'image/webp'}, mime) then
-    return string.sub(mime, 7)
-  end
-  return nil
-end
-
-local function guess_name(path)
-  local ext = guess_ext(path)
-  if ext == nil then
-    error(string.format('failed to guesss ext for ', path))
-  end
-  return string.gsub(vim.fn.fnamemodify(path, ':t'), '%.[^%.]+$', '', 1) .. '.' .. ext
-end
-
 local function is_local(path)
   return string.find(path, '^https?://') == nil
 end
 M.is_local = is_local -- for test
 
+local upload_module = require('imgup.gcloud') -- UNDONE: make it configureable
+
 local function store(path)
+  upload_module.ready()
+
+  if upload_module.has(path) then
+    error("it's already uploaded file")
+  end
+
+  local origin = nil
   if not is_local(path) then
+    origin = path
     path = download(path)
   end
-  local name = guess_name(path)
 
-  local errors = {}
-  for _, module_name in ipairs({'imgup.gcloud'}) do
-    local module = require(module_name)
-    local loaded, err = module.is_valid()
-    if loaded then
-      return module.upload(path, name)
-    end
-    table.insert(errors, string.format('%s: %s', module_name, err))
-  end
-
-  error("there's no valid module; " .. table.concat(errors, '; '))
+  return upload_module.upload(path, origin)
 end
 
 local function replace()
