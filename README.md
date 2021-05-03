@@ -45,7 +45,9 @@ Deployerを内蔵しています。
 ### Google Cloud Storage
 
 Google Cloud Storageにアップロードします。
-Google Cloud SDK、gsutilsのインストールが必要です。
+
+Cloud Storageの設定などはZennの以下記事を参照ください。
+https://zenn.dev/kyoh86/articles/3e894d44c8c849f58262
 
 #### 使用例
 
