@@ -72,23 +72,8 @@ local function exist(path)
   return false
 end
 
-local function guess_mimetype(self)
-  return require('imgup.puremagic.puremagic').via_path(path)
-end
-
-local function guess_ext(self)
-  local mime = self.mimetype()
-  if mime == nil then
-    return nil
-  end
-  if vim.tbl_contains({'image/png', 'image/jpeg', 'image/gif', 'image/tiff', 'image/webp'}, mime) then
-    return '.' .. string.sub(mime, 7)
-  end
-  return nil
-end
-
 local function upload(path)
-  local name = nanoid() .. guess_ext(path)
+  local name = nanoid()
 
   local prefix = vim.g['imgup#gcloud#prefix']
   if prefix ~= nil then

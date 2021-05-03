@@ -1,3 +1,0 @@
-[submodule "lua/puremagic"]
-	path = lua/imgup/puremagic
-	url = https://github.com/wbond/puremagic.git
