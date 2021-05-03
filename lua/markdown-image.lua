@@ -3,12 +3,12 @@ local Job = require 'plenary.job'
 local M = {}
 
 local function get_image_url()
-  return vim.fn['imgup#get_image_url']()
+  return vim.fn['markdown_image#get_image_url']()
 end
 M.get_image_url = get_image_url
 
 local function update_image_url(old, new)
-  vim.fn['imgup#update_image_url'](old, new)
+  vim.fn['markdown_image#update_image_url'](old, new)
 end
 
 local function echo(msg)
@@ -16,7 +16,7 @@ local function echo(msg)
 end
 
 local function download(source)
-  echo(string.format("imgup: Downloading %s...", source))
+  echo(string.format("markdown-image: Downloading %s...", source))
 
   local temp = vim.fn.tempname()
   local _, code = Job:new({
@@ -42,11 +42,11 @@ local function deploy(deployer, source)
   end
 
   if _is_local(source) then
-    echo(string.format("imgup: Deploying %s...", source))
+    echo(string.format("markdown-image: Deploying %s...", source))
     return deployer:deploy(source, nil)
   else
     temp = download(source)
-    echo(string.format("imgup: Deploying %s...", temp))
+    echo(string.format("markdown-image: Deploying %s...", temp))
     repl = deployer:deploy(temp, source)
     os.remove(temp)
     return repl
@@ -60,7 +60,7 @@ local function replace(deployer)
     error("NOT A IMAGE")
   end
   update_image_url(source, deploy(deployer, source))
-  echo("imgup: Replaced.")
+  echo("markdown-image: Replaced.")
 end
 M.replace = replace
 
@@ -71,7 +71,7 @@ local function put(deployer)
   end
   local repl = deploy(deployer, source)
   vim.cmd("put ='![](" .. repl .. ")'")
-  echo("imgup: Put.")
+  echo("markdown-image: Put.")
 end
 M.put = put
 

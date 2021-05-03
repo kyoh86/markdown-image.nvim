@@ -1,4 +1,4 @@
-# imgup.nvim
+# markdown-image.nvim
 
 Markdownに置かれた画像を、配置し直すプラグイン。
 ついでに、画像を自動で配置して画像として挿入する機能を提供する。
@@ -25,8 +25,8 @@ nmapしたキーの前に `"a` のようにレジスタの指定を挟むこと�
 mapして使用することをおすすめします。
 
 ```lua
-vim.api.nvim_set_keymap('n', '<leader>r', [[<cmd>lua require('imgup').replace(deployer)<cr>]], {noremap = true})
-vim.api.nvim_set_keymap('n', '<leader>p', [[<cmd>lua require('imgup').put(deployer)<cr>]], {noremap = true})
+vim.api.nvim_set_keymap('n', '<leader>r', [[<cmd>lua require('markdown-image').replace(deployer)<cr>]], {noremap = true})
+vim.api.nvim_set_keymap('n', '<leader>p', [[<cmd>lua require('markdown-image').put(deployer)<cr>]], {noremap = true})
 ```
 
 deployerには、以下のインターフェイスを満たすDeployerオブジェクトを指定してください。
@@ -62,7 +62,7 @@ https://zenn.dev/kyoh86/articles/3e894d44c8c849f58262
 以下のように使用します。
 
 ```lua
-deployer = require('imgup.gcloud').new(host, config, bucket, prefix)
+deployer = require('markdown-image.gcloud').new(host, config, bucket, prefix)
 ```
 
 | 引数 | 説明 |
@@ -96,21 +96,21 @@ packer.nvimでの設定例は以下のとおりです
 
 ```lua
 use {
-  'kyoh86/imgup.nvim',
+  'kyoh86/markdown-image.nvim',
   rocks = {
     'net-url',
     'nanoid',
   },
   config = function()
-    vim.api.nvim_set_keymap('n', '<leader>mir', [[<cmd>lua require('imgup').replace(require('imgup.gcloud').new('kyoh86.dev', 'post', 'kyoh86.dev', nil))<cr>]], {noremap = true})
-    vim.api.nvim_set_keymap('n', '<leader>mip', [[<cmd>lua require('imgup').put(require('imgup.gcloud').new('kyoh86.dev', 'post', 'kyoh86.dev', nil))<cr>]], {noremap = true})
+    vim.api.nvim_set_keymap('n', '<leader>mir', [[<cmd>lua require('markdown-image').replace(require('markdown-image.gcloud').new('kyoh86.dev', 'post', 'kyoh86.dev', nil))<cr>]], {noremap = true})
+    vim.api.nvim_set_keymap('n', '<leader>mip', [[<cmd>lua require('markdown-image').put(require('markdown-image.gcloud').new('kyoh86.dev', 'post', 'kyoh86.dev', nil))<cr>]], {noremap = true})
   end,
 }
 ```
 
 ## やりたいこと
 
-https://github.com/kyoh86/imgup.nvim/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement
+https://github.com/kyoh86/markdown-image.nvim/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement
 
 ## License
 
