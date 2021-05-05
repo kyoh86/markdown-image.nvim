@@ -1,7 +1,15 @@
 local Job = require 'plenary.job'
-local nanoid = require('nanoid')
 
 local Deployer = {}
+
+local random = math.random
+local function uuid()
+  local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+  return string.gsub(template, '[xy]', function (c)
+    local v = (c == 'x') and random(0, 0xf) or random(8, 0xb)
+    return string.format('%x', v)
+  end)
+end
 
 local function switch_conf(name)
   if name == nil then
@@ -54,7 +62,7 @@ local function exist(path)
 end
 
 local function upload(host, bucket, prefix, path)
-  local name = nanoid()
+  local name = uuid()
 
   if prefix ~= nil and prefix ~= '' then
     name = string.gsub(prefix, '^/+|/+$', '') .. '/' .. name
@@ -83,8 +91,8 @@ end
 
 function Deployer.check(self, origin)
   -- check whether the origin is supported or not
-  local success, url = pcall(require('net.url').parse, origin)
-  if success and url.host == self.host then
+  local match = string.match(origin, '^https?://([^/:]+)')
+  if match == self.host then
     error(string.format("%s is already deployed on %s", self.host, origin))
   end
 end

@@ -76,20 +76,6 @@ deployer = require('markdown-image.gcloud').new(host, config, bucket, prefix)
 
 Google Cloud SDK、gsutilsのインストールが必要です。
 
-また、以下2つのLuaRocksに依存します。
-
-- `net-url`
-- `nanoid`
-
-Packer.nvimの`rocks`に指定したりしてください。
-
-```lua
-rocks = {
-  'net-url',
-  'nanoid',
-},
-```
-
 #### 設定例
 
 packer.nvimでの設定例は以下のとおりです
@@ -97,10 +83,6 @@ packer.nvimでの設定例は以下のとおりです
 ```lua
 use {
   'kyoh86/markdown-image.nvim',
-  rocks = {
-    'net-url',
-    'nanoid',
-  },
   config = function()
     vim.api.nvim_set_keymap('n', '<leader>mir', [[<cmd>lua require('markdown-image').replace(require('markdown-image.gcloud').new('kyoh86.dev', 'post', 'kyoh86.dev', nil))<cr>]], {noremap = true})
     vim.api.nvim_set_keymap('n', '<leader>mip', [[<cmd>lua require('markdown-image').put(require('markdown-image.gcloud').new('kyoh86.dev', 'post', 'kyoh86.dev', nil))<cr>]], {noremap = true})
