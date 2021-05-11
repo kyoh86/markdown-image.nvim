@@ -12,7 +12,7 @@ local function update_image_url(old, new)
 end
 
 local function echo(msg)
-  vim.cmd('echo "' .. vim.fn.escape(msg, '"') .. '" | redraw')
+  vim.cmd('echom "' .. vim.fn.escape(msg, '"') .. '" | redraw')
 end
 
 local function download(source)

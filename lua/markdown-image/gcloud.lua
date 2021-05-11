@@ -44,23 +44,6 @@ local function switch_conf(name)
   return conf_active
 end
 
-local function exist(path)
-  local ls = Job:new({
-    command = 'gsutil',
-    args = {'ls', path},
-    enable_recording = true,
-  })
-  local result, code = ls:sync()
-  if code == 0 then
-    return true
-  end
-  local errors = ls:stderr_result()
-  if not (code == 1 and #errors > 0 and errors[1] == "CommandException: One or more URLs matched no objects.") then
-    error(string.format('failed to check existance of %s: %s (%d)', path, table.concat(errors, '\n'), code))
-  end
-  return false
-end
-
 local function upload(host, bucket, prefix, path)
   local name = uuid()
 
@@ -70,10 +53,6 @@ local function upload(host, bucket, prefix, path)
 
   local bucket_name = bucket
   local gspath = 'gs://' .. bucket_name .. '/' .. name
-
-  if exist(gspath) then
-    error(string.format('%s is already exist', gspath))
-  end
 
   local cp = Job:new({
     command = 'gsutil',
