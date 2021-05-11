@@ -51,7 +51,7 @@ local function exist(path)
     enable_recording = true,
   })
   local result, code = ls:sync()
-  if code == 0 and result == path then
+  if code == 0 then
     return true
   end
   local errors = ls:stderr_result()
