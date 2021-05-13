@@ -2,6 +2,7 @@ local Job = require 'plenary.job'
 
 local Deployer = {}
 
+math.randomseed(os.time())
 local random = math.random
 local function uuid()
   local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
