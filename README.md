@@ -3,6 +3,8 @@
 Markdownに置かれた画像を、配置し直すプラグイン。
 ついでに、画像を自動で配置して画像として挿入する機能を提供する。
 
+動画: [![](https://img.youtube.com/vi/exWp_-QIupE/0.jpg)](https://www.youtube.com/watch?v=exWp_-QIupE)
+
 ## 機能
 
 ### `replace(deployer)`

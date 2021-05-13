@@ -14,7 +14,7 @@ local function upload(token, path)
     },
     enable_recording = true,
   })
-  result, code = cp:sync()
+  result, code = cp:sync(10000, 100)
   if code ~= 0 then
     local errors = cp:stderr_result()
     error(string.format('failed to upload %s: %s (%d)', path, table.concat(errors, '\n'), code))
