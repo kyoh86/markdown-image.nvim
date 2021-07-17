@@ -116,7 +116,7 @@ function Deployer.check(self, origin)
   -- check whether the origin is supported or not
   local match = string.match(origin, "^https?://([^/:]+)")
   if match == self.host then
-    error(string.format("%s is already deployed on %s", self.host, origin))
+    error(string.format("%s is already deployed on %s", origin, self.host))
   end
 end
 
@@ -124,7 +124,6 @@ function Deployer.deploy(self, path, original)
   -- deploy path and get URL for deployed resource
   local prev_conf = switch_conf(self.config)
   local success, ret = pcall(upload, self.host, self.bucket, self.prefix, path)
-  print(ret)
   if prev_conf then
     switch_conf(prev_conf)
   end

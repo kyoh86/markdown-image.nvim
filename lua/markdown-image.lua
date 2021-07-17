@@ -59,7 +59,9 @@ local function replace(deployer)
   -- replace url in the Markdown Image (i.e. "![alternative text](image url)")
   local url = get_image_url()
   local source = url
-  if string.sub(source, 1, 1) ~= "/" then
+  if string.sub(source, 1, 1) == "~" then
+    source = vim.fn.expand(source)
+  elseif string.sub(source, 1, 1) ~= "/" then
     local base = vim.fn.expand("%:p:h")
     source = base .. "/" .. source
   end
