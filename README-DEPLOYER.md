@@ -1,12 +1,12 @@
 # DEPLOYERS
 
-画像のアップロードを担う各種deployerの説明
+画像のアップロードを担う各種deployerについて説明します。
 
 ## Google Cloud Storage
 
 Google Cloud Storageにアップロードします。
 
-Cloud Storageの設定などはZennの以下記事を参照ください。
+Cloud Storageの設定などはZennの以下記事を参照してください。
 https://zenn.dev/kyoh86/articles/3e894d44c8c849f58262
 
 ### 使用例
@@ -20,7 +20,7 @@ deployer = require('markdown-image.gcloud').new(host, config, bucket, prefix)
 | 引数 | 説明 |
 | - | - |
 | host | アップロードしたバケットにアクセスするホスト名。 |
-| config | Google Cloud SDKの構成名。 `gcloud config configurations list` で確認できる |
+| config | Google Cloud SDKの構成名。 `gcloud config configurations list` で確認できる。 |
 | bucket | 使用するCloud Storageのバケット名。 |
 | prefix | アップロード先のディレクトリ。 |
 
@@ -30,7 +30,7 @@ Google Cloud SDK、gsutilsのインストールが必要です。
 
 ### 設定例
 
-packer.nvimでの設定例は以下のとおりです
+packer.nvimでの設定例は以下のとおりです。
 
 ```lua
 use {
@@ -41,7 +41,6 @@ use {
   end,
 }
 ```
-
 
 ## Gyazo
 
@@ -69,7 +68,7 @@ http://curl.haxx.se/
 
 ### 設定例
 
-packer.nvimでの設定例は以下のとおりです
+packer.nvimでの設定例は以下のとおりです。
 
 ```lua
 use {

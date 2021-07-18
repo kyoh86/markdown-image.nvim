@@ -1,0 +1,21 @@
+{
+  "name": "markdown-image.nvim",
+  "scripts": {
+    "lint": "npx textlint *.md",
+    "test": "npm run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kyoh86/imgup.nvim.git"
+  },
+  "author": "kyoh86",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kyoh86/imgup.nvim/issues"
+  },
+  "homepage": "https://github.com/kyoh86/imgup.nvim#readme",
+  "dependencies": {
+    "textlint": "^12.0.2",
+    "textlint-rule-preset-ja-technical-writing": "^7.0.0"
+  }
+}
